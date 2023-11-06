@@ -8,7 +8,7 @@ class Solution
         //List down all FoodItems containing the given name within the minimum and maximum prices given
         var foodsWithinPrice = db.FoodItems
                                 .Where(f => f.Name.Contains(name) && minPrice <= f.Price && f.Price <= maxPrice)
-                                .Select(f => new Dish(f.Name, f.Price));
+                                .Select(f => new Dish(f.Name, f.Price, "lalala"));
         
         return foodsWithinPrice;  //change this line (it is now only used to avoid compiler error)         
     }
@@ -49,7 +49,11 @@ class Solution
                         (o, f) => new {
                             o.CustomerID, f.Name, total = f.Price * o.Quantity //billitems
                         })
-                        .GroupBy(of => of.CustomerID);
+                        .GroupBy(of => new {
+                            of.CustomerID,
+                            of.Name,
+                            of.total
+                        });
         
         return default(IQueryable<CustomerBill>); //change this line (it is now only used to avoid compiler error)  
     }
