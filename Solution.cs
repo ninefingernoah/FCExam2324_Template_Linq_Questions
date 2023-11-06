@@ -94,7 +94,7 @@ class Solution
         HINT: find first those (sub) categories and the corresponding MainCategory (CategoryID attribute).
         Including (Sub) Category and MainCategory (DishWithCategories objects). Self Join
         HINT: Don't forget to add a category even if there is no food item for the given category. Outer Join
-        */
+        */ // vague ass question bro
         var catDishes = db.FoodItems
                         .Join(db.Categories,
                         f => f.CategoryID,
