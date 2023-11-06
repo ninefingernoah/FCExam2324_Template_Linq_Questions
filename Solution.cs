@@ -1,6 +1,7 @@
 
 using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
+using Microsoft.EntityFrameworkCore.Internal;
 
 class Solution
 {
@@ -93,7 +94,7 @@ class Solution
         HINT: Don't forget to add a category even if there is no food item for the given category. Outer Join
         */
         var catDishes = db.FoodItems
-                        .Join(db.Categories,
+                        .LeftJoin(db.Categories,
                         f => f.CategoryID,
                         c=> c.ID,
                         (f,c) => new { f.Name, f.Price, f.Unit, f.CategoryID, scname = c.Name})
