@@ -76,7 +76,8 @@ class Solution
                             .Join(db.Customers,
                             fo => fo.CustomerID,
                             c => c.ID,
-                            (fo, c) => new { fo.FoodItemID })
+                            (fo, c) => new { fo.FoodItemID, c.TableNumber })
+                            .Where(foc => foc.TableNumber != tableNumber)
                             .Select(foc => foc.FoodItemID)
                             .ToList();
         var nonSoldDishes = db.FoodItems.Where(f => soldDishes.Contains(f.ID))
