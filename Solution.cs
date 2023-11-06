@@ -142,7 +142,7 @@ class Solution
                 Order o2 = new()
                 {
                     FoodItemID = food.ID,
-                    CustomerID = c1.ID,
+                    CustomerID = c2.ID,
                     Quantity = 1
                 };
                 db.Orders.Add(o2);
@@ -164,7 +164,7 @@ class Solution
                 Order o2 = new()
                 {
                     FoodItemID = food.ID,
-                    CustomerID = c1.ID,
+                    CustomerID = c2.ID,
                     Quantity = 1
                 };
                 db.Orders.Add(o2);
