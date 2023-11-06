@@ -78,7 +78,7 @@ class Solution
                             c => c.ID,
                             (fo, c) => new { fo.Name, fo.Price, fo.Unit, fo.CustomerID, c.TableNumber})
                             .Where(foc => foc.TableNumber != tableNumber)
-                            .Select(foc => new Dish(foc.Name, foc.Price, foc.Unit));
+                            .Select(foc => new Dish(foc.Name, foc.Price, foc.TableNumber.ToString()));
         return nonSoldDishes;  //change this line (it is now only used to avoid compiler error)  
     }
   
@@ -94,7 +94,7 @@ class Solution
         HINT: Don't forget to add a category even if there is no food item for the given category. Outer Join
         */
         var catDishes = db.FoodItems
-                        .LeftJoin(db.Categories,
+                        .Join(db.Categories,
                         f => f.CategoryID,
                         c=> c.ID,
                         (f,c) => new { f.Name, f.Price, f.Unit, f.CategoryID, scname = c.Name})
@@ -127,7 +127,6 @@ class Solution
         Customer c2 = new();
         db.Customers.Add(c1);
         db.Customers.Add(c2);
-        db.SaveChanges();
         Category first = db.Categories.FirstOrDefault(c=>c.Name == firstCategory);
         if ( first != null) {
             FoodItem food = db.FoodItems.FirstOrDefault(f => f.CategoryID == first.CategoryID);
@@ -148,6 +147,7 @@ class Solution
                 };
                 db.Orders.Add(o2);
                 c++;
+                db.SaveChanges();
             }
         }
          Category snd = db.Categories.FirstOrDefault(c=>c.Name == secondCategory);
@@ -170,6 +170,7 @@ class Solution
                 };
                 db.Orders.Add(o2);
                 c++;
+                db.SaveChanges();
             }
         }
         return c; //change this line (it is now only used to avoid compiler error)  
