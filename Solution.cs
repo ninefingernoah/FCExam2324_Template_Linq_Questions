@@ -1,4 +1,7 @@
 
+using System.Collections.Immutable;
+using System.Runtime.CompilerServices;
+
 class Solution
 {
     //In DataFormats -> Dish
@@ -8,7 +11,7 @@ class Solution
         //List down all FoodItems containing the given name within the minimum and maximum prices given
         var foodsWithinPrice = db.FoodItems
                                 .Where(f => f.Name.Contains(name) && minPrice <= f.Price && f.Price <= maxPrice)
-                                .Select(f => new Dish(f.Name, f.Price, "lalala"));
+                                .Select(f => new Dish(f.Name, f.Price, f.Unit));
         
         return foodsWithinPrice;  //change this line (it is now only used to avoid compiler error)         
     }
@@ -89,8 +92,21 @@ class Solution
         Including (Sub) Category and MainCategory (DishWithCategories objects). Self Join
         HINT: Don't forget to add a category even if there is no food item for the given category. Outer Join
         */
-        ;
-        return default(IQueryable<DishWithCategories>);  //change this line (it is now only used to avoid compiler error)        
+        var catDishes = db.FoodItems
+                        .Join(db.Categories,
+                        f => f.CategoryID,
+                        c=> c.ID,
+                        (f,c) => new { f.Name, f.Price, f.Unit, f.CategoryID, scname = c.Name})
+                        .Join(db.Categories,
+                        fc => fc.CategoryID,
+                        c => c.CategoryID,
+                        (fc, c) => new {fc.Name, fc.Price, fc.Unit, cname = c.Name, scname = fc.scname})
+                        .Select(fcc => new DishWithCategories() {
+                            MainCategory = fcc.cname,
+                            CategoryName = fcc.scname,
+                            Food = new Dish(fcc.Name, fcc.Price, fcc.Unit)
+                        });
+        return catDishes;  //change this line (it is now only used to avoid compiler error)        
    
     }
     
