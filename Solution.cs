@@ -85,7 +85,7 @@ class Solution
         Including (Sub) Category and MainCategory (DishWithCategories objects). Self Join
         HINT: Don't forget to add a category even if there is no food item for the given category. Outer Join
         */
-
+        ;
         return default(IQueryable<DishWithCategories>);  //change this line (it is now only used to avoid compiler error)        
    
     }
@@ -101,7 +101,56 @@ class Solution
         //   customer two -> order3{customer2, firstCategory product3}; order4{customer2, secondCategory product4}
         //One or both given categories might NOT exist, in this case make sure an order is not placed, 
         //the two customers should be added anyways. 
-
-        return default(int); //change this line (it is now only used to avoid compiler error)  
+        int c = 0;
+        Customer c1 = new();
+        Customer c2 = new();
+        db.Customers.Add(c1);
+        db.Customers.Add(c2);
+        db.SaveChanges();
+        Category first = db.Categories.FirstOrDefault(c=>c.Name == firstCategory);
+        if ( first != null) {
+            FoodItem food = db.FoodItems.FirstOrDefault(f => f.CategoryID == first.CategoryID);
+            if(food != null){
+                Order o1 = new()
+                {
+                    FoodItemID = food.ID,
+                    CustomerID = c1.ID,
+                    Quantity = 2
+                };
+                db.Orders.Add(o1);
+                c++;
+                Order o2 = new()
+                {
+                    FoodItemID = food.ID,
+                    CustomerID = c1.ID,
+                    Quantity = 1
+                };
+                db.Orders.Add(o2);
+                c++;
+            }
+        }
+         Category snd = db.Categories.FirstOrDefault(c=>c.Name == secondCategory);
+        if ( snd != null) {
+            FoodItem food = db.FoodItems.FirstOrDefault(f => f.CategoryID == snd.CategoryID);
+            if(food != null){
+                Order o1 = new()
+                {
+                    FoodItemID = food.ID,
+                    CustomerID = c1.ID,
+                    Quantity = 2
+                };
+                db.Orders.Add(o1);
+                c++;
+                Order o2 = new()
+                {
+                    FoodItemID = food.ID,
+                    CustomerID = c1.ID,
+                    Quantity = 1
+                };
+                db.Orders.Add(o2);
+                c++;
+            }
+        }
+        return c; //change this line (it is now only used to avoid compiler error)  
     }
 }
