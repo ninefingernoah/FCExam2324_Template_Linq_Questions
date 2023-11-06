@@ -8,7 +8,7 @@ class Solution
         //List down all FoodItems containing the given name within the minimum and maximum prices given
         var foodsWithinPrice = db.FoodItems
                                 .Where(f => f.Name.Contains(name) && minPrice <= f.Price && f.Price <= maxPrice)
-                                .Select(f => new Dish(f.Name, f.Price, f.Unit));
+                                .Select(f => new Dish(f.Name, f.Price));
         
         return foodsWithinPrice;  //change this line (it is now only used to avoid compiler error)         
     }
