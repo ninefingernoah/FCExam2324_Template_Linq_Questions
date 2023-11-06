@@ -6,8 +6,11 @@ class Solution
     public static IQueryable<Dish> Q1(ExamContext db, string name, decimal minPrice, decimal maxPrice)
     {
         //List down all FoodItems containing the given name within the minimum and maximum prices given
+        var foodsWithinPrice = db.FoodItems
+                                .Where(f => f.Name.Contains(name) && minPrice <= f.Price && f.Price <= maxPrice)
+                                .Select(f => new Dish(f.Name, f.Price, f.Unit));
         
-        return default(IQueryable<Dish>);  //change this line (it is now only used to avoid compiler error)         
+        return foodsWithinPrice;  //change this line (it is now only used to avoid compiler error)         
     }
  
     //In DataFormats -> DishAndCategory
@@ -15,8 +18,22 @@ class Solution
     public static IQueryable<DishAndCategory> Q2(ExamContext db, int customerId)
     {
         //List down all FoodItems including the Category ordered by a Customer (CustomerID given as parameter)
-   
-        return default(IQueryable<DishAndCategory>);  //change this line (it is now only used to avoid compiler error)  
+        var customersFood = db.Orders
+                            .Where(o => o.CustomerID == customerId)
+                            .Join(db.FoodItems, 
+                            orders => orders.FoodItemID,
+                            food => food.ID,
+                            (orders, food) => new {
+                                food.Name, food.Price, food.Unit, food.CategoryID
+                            }).Join(db.Categories,
+                            fo => fo.CategoryID,
+                            c => c.ID,
+                            (fo, c) => new {
+                                fo.Name, fo.Price, fo.Unit, cname = c.Name
+                            }
+                            )
+                            .Select(dc => new DishAndCategory(dc.Name, dc.Price, dc.Unit, dc.cname));
+        return customersFood;  //change this line (it is now only used to avoid compiler error)  
     }
 
     //In DataFormats -> CustomerBill (BillItem)
@@ -25,6 +42,14 @@ class Solution
         //List down the bills: FoodItems, Order Quantity, Unit Price, Total,
         //for the first "number" of Customers (ordered based on Total). 
         //Return an Iqueryable<CustomerBill> which will let fetch exactly the "number" of bills
+        var billsDesc = db.Orders
+                        .Join(db.FoodItems,
+                        o => o.FoodItemID,
+                        f => f.ID,
+                        (o, f) => new {
+                            o.CustomerID, f.Name, total = f.Price * o.Quantity //billitems
+                        })
+                        .GroupBy(of => of.CustomerID);
         
         return default(IQueryable<CustomerBill>); //change this line (it is now only used to avoid compiler error)  
     }
@@ -33,8 +58,20 @@ class Solution
     {
         // List down dishes >>>NOT<<< sold at a given table
         // Ordering according to the dish price.
-
-        return default(IQueryable<Dish>);  //change this line (it is now only used to avoid compiler error)  
+        var nonSoldDishes = db.FoodItems
+                            .Join(db.Orders,
+                            f => f.ID,
+                            o => o.FoodItemID,
+                            (f , o) => new {
+                                f.Name, f.Price, f.Unit, o.FoodItemID, o.CustomerID
+                            })
+                            .Join(db.Customers,
+                            fo => fo.CustomerID,
+                            c => c.ID,
+                            (fo, c) => new { fo.Name, fo.Price, fo.Unit, fo.CustomerID, c.TableNumber})
+                            .Where(foc => foc.TableNumber != tableNumber)
+                            .Select(foc => new Dish(foc.Name, foc.Price, foc.Unit));
+        return nonSoldDishes;  //change this line (it is now only used to avoid compiler error)  
     }
   
     //In DataFormats -> record DishWithCategories
